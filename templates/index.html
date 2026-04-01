@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Resume</title>
+</head>
+<body>
+    <h1>My Resume</h1>
+
+    <h2>Experiences</h2>
+    <ul>
+        {% for exp in experiences %}
+            <li>{{ exp.title }} at {{ exp.company }}</li>
+        {% endfor %}
+    </ul>
+
+    <form action="/add_experience" method="post">
+        <input type="text" name="title" placeholder="Job Title" required>
+        <input type="text" name="company" placeholder="Company" required>
+        <button type="submit">Add Experience</button>
+    </form>
+
+    <h2>Skills</h2>
+    <ul>
+        {% for skill in skills %}
+            <li>{{ skill }}</li>
+        {% endfor %}
+    </ul>
+
+    <form action="/add_skill" method="post">
+        <input type="text" name="skill" placeholder="Skill" required>
+        <button type="submit">Add Skill</button>
+    </form>
+
+</body>
+</html>
