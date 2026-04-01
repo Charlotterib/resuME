@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>My Resume</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <h1>My Resume</h1>
@@ -29,6 +30,21 @@
     <form action="/add_skill" method="post">
         <input type="text" name="skill" placeholder="Skill" required>
         <button type="submit">Add Skill</button>
+    </form>
+
+    <h2>Education</h2>
+
+    <ul>
+        {% for f in formations %}
+            <li>{{ f.degree }} at {{ f.school }} ({{ f.date_of_graduation }})</li>
+        {% endfor %}
+    </ul>
+
+    <form action="/add_formation" method="post">
+        <input type="text" name="school" placeholder="School" required>
+        <input type="text" name="degree" placeholder="Degree" required>
+        <input type="text" name="date_of_graduation" placeholder="Graduation Date" required>
+        <button type="submit">Add Education</button>
     </form>
 
 </body>
