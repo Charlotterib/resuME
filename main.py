@@ -1,20 +1,52 @@
-from fastapi import FastAPI, Request, Form
+from typing import Annotated
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-app = FastAPI()
 
+
+class Experience(SQLModel, table=True):
+    id: int | None =Field(default=None, primary_key=True)
+    title: str = Field(index=True)
+    company: str = Field(index=True)
 # In-memory storage
-experiences = []
+
 skills = []
 formation=[]
+
+sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args)
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    create_db_and_tables()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
+def home(request: Request, session: SessionDep):
+    experiences = session.exec(select(Experience)).all()
     return templates.TemplateResponse(
         "index.html",
         {
@@ -26,9 +58,26 @@ def home(request: Request):
         },
     )
 
+
+'''
 @app.post("/add_experience")
-def add_experience(title: str = Form(...), company: str = Form(...)):
-    experiences.append({"title": title, "company": company})
+def add_experience(experience: Experience, session: SessionDep) -> Experience:
+    session.add(experience)
+    session.commit()
+    session.refresh(experience)
+    return experience
+'''
+@app.post("/add_experience")
+def add_experience(
+    session: SessionDep,
+    title: str = Form(...),
+    company: str = Form(...),
+    
+    ):
+    experience = Experience(title=title, company=company)
+    session.add(experience)
+    session.commit()
+
     return RedirectResponse(url="/", status_code=303)
 
 @app.post("/add_skill")
