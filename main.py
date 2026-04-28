@@ -43,7 +43,7 @@ app = FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
-
+''''
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request, session: SessionDep):
     experiences = session.exec(select(Experience)).all()
@@ -57,7 +57,20 @@ def home(request: Request, session: SessionDep):
 
         },
     )
+'''
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request, session: SessionDep):
+    experiences = session.exec(select(Experience)).all()
 
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "experiences": experiences,
+            "skills": skills,
+            "formations": formation,
+        },
+    )
 
 '''
 @app.post("/add_experience")
