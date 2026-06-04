@@ -3,7 +3,8 @@ from app.core.database import Base
 
 
 class CvSection(Base):
-    """Représente une section du CV dans la base de données.
+    """
+    Représente une section du CV dans la base de données.
 
     Chaque entrée correspond à un bloc d'information affiché sur le portfolio :
     profil, expérience, formation, compétence, projet, langue, intérêt ou lien.
@@ -20,7 +21,7 @@ class CvSection(Base):
     __tablename__ = "cv_sections"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    section_type = Column(String(50), nullable=False)   # about | experience | formation | skill | project | language | interest | link
+    section_type = Column(String(50), nullable=False)   # about, experience, formation, skill, project, language, interest, link
     title = Column(String(200), nullable=False)          # Titre principal de l'entrée
     subtitle = Column(String(200), nullable=True)        # Sous-titre optionnel (entreprise, école, niveau…)
     description = Column(Text, nullable=True)            # Texte libre
@@ -28,4 +29,5 @@ class CvSection(Base):
     extra = Column(String, nullable=True)                # Données additionnelles sérialisées en JSON
 
     def __str__(self):
+        #renvoie l'objet sous forme de texte, peut être utilisé si il y a un bug
         return f"[{self.section_type}] {self.title}"

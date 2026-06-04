@@ -1,6 +1,6 @@
 # Minimal FastAPI Example
 
-Application web minimaliste construite avec FastAPI. Elle combine un portfolio CV dynamique gérable depuis une interface admin.
+Portfolio construit avec FastAPI. Il s'agit d'un portfolio CV dynamique qu'on peut gérer depuis l'admin.
 
 ## Fonctionnalités
 
@@ -8,125 +8,55 @@ Application web minimaliste construite avec FastAPI. Elle combine un portfolio C
 - **Interface admin** — modification du contenu du CV sans authentification via `/admin`
 - **Documentation API** — interface Swagger automatique sur `/docs`
 
-## Stack technique
+## Partie technique
 
-| Composant | Technologie |
-|-----------|-------------|
-| Framework web | [FastAPI](https://fastapi.tiangolo.com/) |
-| Base de données | SQLite via [SQLAlchemy](https://www.sqlalchemy.org/) |
-| Templates HTML | [Jinja2](https://jinja.palletsprojects.com/) |
-| Validation des données | [Pydantic v2](https://docs.pydantic.dev/) |
-| Serveur | [Uvicorn](https://www.uvicorn.org/) |
+API Web : FastAPI
+Base de Données : SQLite avec l'outil SQLAlchemy
+Templates HTML : Jinja2
+Serveur : Uvicorn
 
-## Installation
-
-### 1. Prérequis
-
-Python 3.10 ou supérieur. Vérifier avec :
-```bash
-python --version
-```
-
-### 2. Créer et activer un environnement virtuel
+## Installation et Lancement
 
 ```bash
+#Clone le repo
+git clone https://github.com/Charlotterib/resuME
 # Créer l'environnement
 python -m venv .venv
 
-# Activer (Windows PowerShell)
+# Activer 
 .venv\Scripts\Activate.ps1
-
-# Activer (Linux / macOS)
-source .venv/bin/activate
 ```
 
-### 3. Installer les dépendances
-
 ```bash
+#dépendences
 pip install -r requirements.txt
 ```
 
-### 4. Lancer l'application
-
 ```bash
-python app/main.py
+#lancement du serveur
+uvicorn app.main:app --host localhost --port 8000 --reload
 ```
 
 L'application est accessible sur **http://localhost:8000**.
 
 ## Pages disponibles
 
-| URL | Description |
-|-----|-------------|
-| `http://localhost:8000/` | Portfolio CV public |
-| `http://localhost:8000/admin` | Interface d'administration du CV |
-| `http://localhost:8000/docs` | Documentation interactive de l'API (Swagger UI) |
+ `http://localhost:8000/`  Portfolio CV public 
+ `http://localhost:8000/admin`  Interface d'administration du CV 
+ `http://localhost:8000/docs`  Documentation interactive de l'API (Swagger UI) 
 
 
-
-## Structure du projet
-
-```
-minimal_fastapi_example/
-│
-├── app/
-│   ├── main.py                      # Point d'entrée, configuration FastAPI
-│   │
-│   ├── core/
-│   │   └── database.py              # Connexion SQLite, Base SQLAlchemy, get_db()
-│   │
-│   ├── models/
-│   │   ├── cv_section.py            # Modèle ORM : table cv_sections
-│   │   └── measurement.py           # Modèle ORM : table measurements
-│   │
-│   ├── schemas/
-│   │   ├── cv_section_schema.py     # Schémas Pydantic pour le CV (Create, Update)
-│   │   └── measurement_schema.py    # Schémas Pydantic pour les mesures
-│   │
-│   ├── crud/
-│   │   ├── cv_section_crud.py       # Opérations CRUD sur les sections de CV
-│   │   └── measurement_crud.py      # Opérations CRUD sur les mesures
-│   │
-│   ├── routers/
-│   │   ├── cv_router.py             # Routes portfolio et admin
-│   │   └── measurement_router.py    # Routes API mesures
-│   │
-│   └── templates/
-│       ├── portfolio.html           # Page CV publique
-│       ├── admin.html               # Interface d'administration
-│       └── admin_edit.html          # Formulaire de modification d'une section
-│
-├── static/
-│   └── photos/                      # Images servies statiquement
-│
-├── tests/
-│   ├── conftest.py                  # Fixtures pytest (base de données en mémoire)
-│   └── test_cv_crud.py              # Tests unitaires du CRUD CV
-│
-├── requirements.txt                 # Dépendances Python
-└── conftest.py                      # Configuration pytest (ajout de app/ au sys.path)
-```
-
-## Base de données
-
-SQLite, fichier créé automatiquement au premier démarrage : `app/localdb.sqlite3`.
 
 ### Table `cv_sections`
 
-| Colonne | Type | Description |
-|---------|------|-------------|
-| `id` | INTEGER | Clé primaire, auto-incrémentée |
-| `section_type` | TEXT | Type : `about`, `experience`, `formation`, `skill`, `project`, `language`, `interest`, `link` |
-| `title` | TEXT | Titre principal de l'entrée |
-| `subtitle` | TEXT | Sous-titre optionnel (entreprise, école, niveau…) |
-| `description` | TEXT | Texte libre optionnel |
-| `order` | INTEGER | Ordre d'affichage au sein du même type |
-| `extra` | TEXT | Champs additionnels sérialisés en JSON (dates, URL, niveau…) |
+Cette table contient toutes les informations du portfolio. Chaque ligne correspond à une section du CV (profil, expérience, formation, compétence, projet, etc.).
 
+- **id** *(INTEGER)* : identifiant unique de la section, généré automatiquement (clé primaire).
+- **section_type** *(VARCHAR(50))* : type de la section (`about`, `experience`, `formation`, `skill`, `project`, `language`, `interest` ou `link`).
+- **title** *(VARCHAR(200))* : titre principal affiché sur le portfolio.
+- **subtitle** *(VARCHAR(200))* : sous-titre optionnel (entreprise, école, niveau, etc.).
+- **description** *(TEXT)* : description détaillée de la section.
+- **order** *(INTEGER)* : ordre d'affichage des éléments appartenant à un même type de section.
+- **extra** *(TEXT)* : informations supplémentaires stockées au format JSON (dates, localisation, niveau de compétence, URL, GitHub, etc.).
 
-## Lancer les tests
-
-```bash
-pytest tests/ -v
-```
-
+Le champ **extra** permet de stocker des données différentes selon le type de section sans avoir besoin d'ajouter de nouvelles colonnes à la table.

@@ -1,39 +1,32 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Localisation of the SQLite database file
-# (SQLite is a special type of database where everything is stored in an unique file
+#pour récuperer l'url de la base ( path du fichier physique)
 SQLALCHEMY_DATABASE_URL = "sqlite:///app/localdb.sqlite3"
 
-# Create the database engine. This is the core interface for SQLAlchemy to interact with the database.
+# create_engine est un outil de base de donnée, il fait le lien en l'app et la db
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
-    echo=True, # If set to True, SQLAlchemy logs all SQL statements executed. Useful for debugging.
-    connect_args={"check_same_thread": False} # Required for using SQLAlchemy with multiple threads (e.g., in a web application).  SQLite has threading limitations.
+    echo=True,
+    connect_args={"check_same_thread": False}
 )
 
-# SessionLocal is a class that manages database sessions.  Each session represents a connection to the database.
+
+# session local va gérer les sessions d'utilisation de la databse, une session = une connexion a la db
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Declarative base class. All SQLAlchemy models (database tables) will inherit from this base.
+# base est la classe mère des modeles, les sous-classes qui en héritent seront bien prises par l'outil SQLAlchemy comme des tables SQL
 Base = declarative_base()
 
 def create_db():
-    """
-    Creates the database tables based on the defined SQLAlchemy models.
-    This function should be called once during application startup 
-    (e.g., when the application first starts or when a database migration is needed).
-    """
-    # Base.metadata.create_all(bind=engine) creates all tables defined in the models, if they don't already exist.
+    # Tous les modèles créés depuis la Base sont transformés en tables SQL si elles n'existent pas déjà
     Base.metadata.create_all(bind=engine)
 
 def get_db():
     """
-    Dependency injection function to provide a database session.
-    This function is designed to be used as a dependency in API endpoints (e.g., using FastAPI or similar frameworks).
-    It opens a database session, yields it to the calling function, and then automatically closes the session 
-    when the calling function is finished. This ensures that database connections are properly managed 
-    and resources are released.
+    Cette fonction est utilisée pour ouvrir une database session lorsqu'une fonction qui a besoin de la database l'appelle ,
+    Puis la refermer à la fin de l'appel de fonction. Elle permet de gérer proprement les connections avec la database
+    On ouvre la connexion, puis lecture/ecriture, on valide et on referme
     """
     db = SessionLocal()
     try:
