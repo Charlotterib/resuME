@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if about %}{{ about.title }}{% else %}Portfolio{% endif %}</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --bg: #0f172a; --bg-card: #1e293b; --accent: #6366f1;
+            --accent-light: #818cf8; --text: #e2e8f0; --text-muted: #94a3b8;
+            --border: #334155;
+        }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; line-height: 1.6; }
+
+        nav {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: #0f172a;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; z-index: 100;
+        }
+        nav .logo { font-weight: 700; color: var(--accent-light); }
+        nav ul { list-style: none; display: flex; gap: 2rem; }
+        nav a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; }
+        nav a:hover { color: var(--text); }
+
+        section { padding: 4rem 2rem; max-width: 900px; margin: 0 auto; }
+
+        .hero { padding-top: 6rem; padding-bottom: 4rem; }
+        .hero h1 { font-size: 2.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+        .hero-role { font-size: 1.2rem; color: var(--text-muted); margin-bottom: 1rem; }
+        .hero-bio { color: var(--text-muted); max-width: 600px; margin-bottom: 1rem; }
+        .hero-meta { display: flex; gap: 1.5rem; flex-wrap: wrap; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+        .btn { display: inline-block; padding: 0.6rem 1.4rem; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-light); }
+        .btn-outline { border: 1px solid var(--border); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+        .section-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .section-divider { width: 40px; height: 3px; background: var(--accent); border-radius: 2px; margin-bottom: 2rem; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1rem; }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem; }
+        .card-title { font-size: 1rem; font-weight: 600; }
+        .card-subtitle { color: var(--accent-light); font-size: 0.9rem; }
+        .card-date { color: var(--text-muted); font-size: 0.85rem; }
+        .card-desc { color: var(--text-muted); font-size: 0.9rem; margin-top: 0.5rem; }
+
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+        .skill-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem; }
+        .skill-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .skill-name { font-weight: 600; font-size: 0.9rem; }
+        .skill-cat { color: var(--text-muted); font-size: 0.8rem; }
+        .skill-bar-bg { background: var(--border); border-radius: 4px; height: 5px; }
+        .skill-bar { background: var(--accent); border-radius: 4px; height: 5px; }
+
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .project-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; }
+        .project-title { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+        .project-stack { color: var(--accent-light); font-size: 0.85rem; margin-bottom: 0.6rem; }
+        .project-desc { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+        .project-links { display: flex; gap: 0.8rem; }
+        .project-link { color: var(--text-muted); font-size: 0.85rem; text-decoration: none; }
+        .project-link:hover { color: var(--accent); }
+
+        .badges { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+        .badge { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 0.3rem 0.9rem; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+        .badge-level { color: var(--text-muted); font-size: 0.8rem; }
+
+        .link-buttons { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .link-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 1.2rem; text-decoration: none; color: var(--text); font-size: 0.9rem; }
+        .link-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+        .admin-link { display: block; text-align: right; max-width: 900px; margin: 0 auto; padding: 1rem 2rem 2rem; }
+        .admin-link a { color: var(--text-muted); font-size: 0.85rem; text-decoration: none; }
+        .admin-link a:hover { color: var(--accent); }
+
+        .empty { color: var(--text-muted); font-style: italic; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <span class="logo">{% if about %}{{ about.title }}{% else %}Portfolio{% endif %}</span>
+    <ul>
+        {% if experiences %}<li><a href="#experience">Expériences</a></li>{% endif %}
+        {% if formations %}<li><a href="#formation">Formations</a></li>{% endif %}
+        {% if skills %}<li><a href="#skills">Compétences</a></li>{% endif %}
+        {% if projects %}<li><a href="#projects">Projets</a></li>{% endif %}
+        {% if links %}<li><a href="#links">Contact</a></li>{% endif %}
+    </ul>
+</nav>
+
+<section class="hero" id="about">
+    {% if about %}
+        <h1>{{ about.title }}</h1>
+        {% if about.subtitle %}<p class="hero-role">{{ about.subtitle }}</p>{% endif %}
+        {% if about.description %}<p class="hero-bio">{{ about.description }}</p>{% endif %}
+        <div class="hero-meta">
+            {% if about.extra_dict.get('email') %}<span>✉ {{ about.extra_dict['email'] }}</span>{% endif %}
+            {% if about.extra_dict.get('location') %}<span>📍 {{ about.extra_dict['location'] }}</span>{% endif %}
+        </div>
+    {% else %}
+        <h1>Votre nom</h1>
+        <p class="empty">Ajoutez votre profil depuis <a href="/admin" style="color:var(--accent)">l'admin</a>.</p>
+    {% endif %}
+    <div class="hero-actions">
+        {% for link in links %}
+            <a href="{{ link.extra_dict.get('url', '#') }}" class="btn btn-primary" target="_blank">{{ link.title }}</a>
+        {% endfor %}
+        <a href="/admin" class="btn btn-outline">⚙ Admin</a>
+    </div>
+</section>
+
+{% if experiences %}
+<section id="experience">
+    <h2 class="section-title">Expériences professionnelles</h2>
+    <div class="section-divider"></div>
+    {% for exp in experiences %}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">{{ exp.title }}</div>
+                {% if exp.subtitle %}<div class="card-subtitle">{{ exp.subtitle }}</div>{% endif %}
+            </div>
+            <div class="card-date">
+                {% if exp.extra_dict.get('date_start') %}{{ exp.extra_dict['date_start'] }}{% endif %}
+                {% if exp.extra_dict.get('date_end') %} – {{ exp.extra_dict['date_end'] }}{% endif %}
+                {% if exp.extra_dict.get('location') %} · {{ exp.extra_dict['location'] }}{% endif %}
+            </div>
+        </div>
+        {% if exp.description %}<p class="card-desc">{{ exp.description }}</p>{% endif %}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if formations %}
+<section id="formation">
+    <h2 class="section-title">Formations</h2>
+    <div class="section-divider"></div>
+    {% for f in formations %}
+    <div class="card">
+        <div class="card-header">
+            <div>
+                <div class="card-title">{{ f.title }}</div>
+                {% if f.subtitle %}<div class="card-subtitle">{{ f.subtitle }}</div>{% endif %}
+            </div>
+            <div class="card-date">
+                {% if f.extra_dict.get('date_start') %}{{ f.extra_dict['date_start'] }}{% endif %}
+                {% if f.extra_dict.get('date_end') %} – {{ f.extra_dict['date_end'] }}{% endif %}
+            </div>
+        </div>
+        {% if f.description %}<p class="card-desc">{{ f.description }}</p>{% endif %}
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+{% if skills %}
+<section id="skills">
+    <h2 class="section-title">Compétences</h2>
+    <div class="section-divider"></div>
+    <div class="skills-grid">
+        {% for skill in skills %}
+        <div class="skill-item">
+            <div class="skill-header">
+                <span class="skill-name">{{ skill.title }}</span>
+                {% if skill.subtitle %}<span class="skill-cat">{{ skill.subtitle }}</span>{% endif %}
+            </div>
+            {% if skill.extra_dict.get('level') is not none %}
+            <div class="skill-bar-bg">
+                <div class="skill-bar" style="width: {{ skill.extra_dict.get('level', 0) }}%"></div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if projects %}
+<section id="projects">
+    <h2 class="section-title">Projets</h2>
+    <div class="section-divider"></div>
+    <div class="projects-grid">
+        {% for proj in projects %}
+        <div class="project-card">
+            <div class="project-title">{{ proj.title }}</div>
+            {% if proj.subtitle %}<div class="project-stack">{{ proj.subtitle }}</div>{% endif %}
+            {% if proj.description %}<p class="project-desc">{{ proj.description }}</p>{% endif %}
+            <div class="project-links">
+                {% if proj.extra_dict.get('url') %}<a href="{{ proj.extra_dict['url'] }}" class="project-link" target="_blank">🔗 Voir le projet</a>{% endif %}
+                {% if proj.extra_dict.get('github') %}<a href="{{ proj.extra_dict['github'] }}" class="project-link" target="_blank">⚙ GitHub</a>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if languages %}
+<section id="languages">
+    <h2 class="section-title">Langues</h2>
+    <div class="section-divider"></div>
+    <div class="badges">
+        {% for lang in languages %}
+        <div class="badge">
+            <span>{{ lang.title }}</span>
+            {% if lang.subtitle %}<span class="badge-level">{{ lang.subtitle }}</span>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if interests %}
+<section id="interests">
+    <h2 class="section-title">Centres d'intérêt</h2>
+    <div class="section-divider"></div>
+    <div class="badges">
+        {% for interest in interests %}
+        <div class="badge">{{ interest.title }}</div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if links %}
+<section id="links">
+    <h2 class="section-title">Contact</h2>
+    <div class="section-divider"></div>
+    <div class="link-buttons">
+        {% for link in links %}
+        <a href="{{ link.extra_dict.get('url', '#') }}" class="link-btn" target="_blank">{{ link.title }}</a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<div class="admin-link"><a href="/admin">⚙ Administration</a></div>
+
+</body>
+</html>

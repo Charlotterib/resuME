@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier — Admin</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f8fafc; color: #1e293b; }
+        header { background: #1e293b; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 1.1rem; }
+        header a { color: #818cf8; text-decoration: none; font-size: 0.9rem; }
+        .container { max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .card { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 2rem; }
+        .card h2 { font-size: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1.5rem; }
+        .form-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .field { display: flex; flex-direction: column; gap: 0.3rem; }
+        .field label { font-size: 0.78rem; font-weight: 600; color: #64748b; }
+        .field input, .field textarea { padding: 0.5rem 0.7rem; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; font-family: inherit; background: white; }
+        .field input:focus, .field textarea:focus { outline: none; border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+        .field textarea { resize: vertical; min-height: 80px; }
+        .actions { margin-top: 1.5rem; display: flex; gap: 1rem; }
+        .btn-save { background: #6366f1; color: white; border: none; border-radius: 6px; padding: 0.6rem 1.4rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+        .btn-save:hover { background: #4f46e5; }
+        .btn-cancel { padding: 0.6rem 1.4rem; border: 1px solid #e2e8f0; border-radius: 6px; color: #64748b; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Modifier — {{ section.section_type }}</h1>
+    <a href="/admin">← Retour</a>
+</header>
+<div class="container">
+    <div class="card">
+        <h2>Entrée #{{ section.id }}</h2>
+        <form action="/admin/sections/{{ section.id }}/edit" method="post">
+            <div class="form-grid">
+                <div class="field"><label>Titre *</label><input name="title" required value="{{ section.title }}"></div>
+
+                {% if section.section_type in ['about', 'experience', 'formation', 'skill', 'project', 'language'] %}
+                <div class="field"><label>Sous-titre</label><input name="subtitle" value="{{ section.subtitle or '' }}"></div>
+                {% endif %}
+
+                {% if section.section_type in ['about', 'experience', 'formation', 'project'] %}
+                <div class="field"><label>Description</label><textarea name="description">{{ section.description or '' }}</textarea></div>
+                {% endif %}
+
+                {% if section.section_type == 'about' %}
+                <div class="field"><label>Email</label><input name="extra_email" type="email" value="{{ section.extra_dict.get('email', '') }}"></div>
+                <div class="field"><label>Localisation</label><input name="extra_location" value="{{ section.extra_dict.get('location', '') }}"></div>
+
+                {% elif section.section_type == 'experience' %}
+                <div class="field"><label>Date début</label><input name="extra_date_start" value="{{ section.extra_dict.get('date_start', '') }}"></div>
+                <div class="field"><label>Date fin</label><input name="extra_date_end" value="{{ section.extra_dict.get('date_end', '') }}"></div>
+                <div class="field"><label>Lieu</label><input name="extra_location" value="{{ section.extra_dict.get('location', '') }}"></div>
+
+                {% elif section.section_type == 'formation' %}
+                <div class="field"><label>Date début</label><input name="extra_date_start" value="{{ section.extra_dict.get('date_start', '') }}"></div>
+                <div class="field"><label>Date fin</label><input name="extra_date_end" value="{{ section.extra_dict.get('date_end', '') }}"></div>
+
+                {% elif section.section_type == 'skill' %}
+                <div class="field"><label>Niveau (0–100)</label><input name="extra_level" type="number" min="0" max="100" value="{{ section.extra_dict.get('level', 0) }}"></div>
+
+                {% elif section.section_type == 'project' %}
+                <div class="field"><label>URL du projet</label><input name="extra_url" type="url" value="{{ section.extra_dict.get('url', '') }}"></div>
+                <div class="field"><label>GitHub</label><input name="extra_github" type="url" value="{{ section.extra_dict.get('github', '') }}"></div>
+
+                {% elif section.section_type == 'link' %}
+                <div class="field"><label>URL</label><input name="extra_url" type="url" value="{{ section.extra_dict.get('url', '') }}"></div>
+                {% endif %}
+
+                <div class="field"><label>Ordre</label><input name="order" type="number" value="{{ section.order }}"></div>
+            </div>
+            <div class="actions">
+                <button type="submit" class="btn-save">Enregistrer</button>
+                <a href="/admin" class="btn-cancel">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>
