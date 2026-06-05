@@ -2,7 +2,7 @@
 
 Routes exposées :
     GET  /                              → Page portfolio publique
-    GET  /admin                         → Interface d'administration (sans authentification)
+    GET  /admin                         → Interface d'administration 
     POST /admin/sections                → Créer une section
     GET  /admin/sections/{id}/edit      → Formulaire de modification
     POST /admin/sections/{id}/edit      → Enregistrer les modifications
@@ -18,17 +18,19 @@ from app.core.database import get_db
 from collections import defaultdict
 from urllib.parse import urlencode
 import json
-
+#pour enregistrer toutes les routes du CV
 router = APIRouter(tags=["CV"])
+#Permet d'utiliser les pages html (mise en forme)
 templates = Jinja2Templates(directory="app/templates")
 
 
 def _parse_extra(section):
-    """Ajoute l'attribut `extra_dict` à une instance CvSection.
+    """
+    Dans la base, les éléments "extra" (ex :email : a@b.fr)sont stockés sous forme JSON texte.
+    Cette fonction transforme le texte JSON en dict, qui sera plus facilement lu par  les templates Jinja
+    Ajoute l'attribut `extra_dict` à une instance CvSection.
+    
 
-    Le champ `extra` est stocké en JSON dans la base. Cette fonction le
-    désérialise et l'attache directement à l'objet pour faciliter l'accès
-    dans les templates Jinja2 (ex: section.extra_dict.get('email')).
 
     Args:
         section: Instance CvSection issue de SQLAlchemy.
@@ -60,18 +62,13 @@ def _group_sections(sections: list) -> dict:
 def _build_extra(section_type: str, extra_email: str, extra_location: str,
                  extra_date_start: str, extra_date_end: str, extra_level: str,
                  extra_url: str, extra_github: str) -> str | None:
-    """Construit la chaîne JSON `extra` à partir des champs de formulaire.
+    """
+    Construit la chaîne JSON `extra` à partir des champs de formulaire.
 
     Chaque type de section utilise un sous-ensemble des champs disponibles.
-    Les types non reconnus (language, interest) retournent None.
+    Prend en entrée le type de la section et toutes les valeurs des champs du formulaire.
+    Renvoie chaîne JSON pour les sections avec extras, sinon None
 
-    Args:
-        section_type: Type de la section (about, experience, skill…).
-        extra_email, extra_location, extra_date_start, extra_date_end,
-        extra_level, extra_url, extra_github: Valeurs des champs du formulaire.
-
-    Returns:
-        Chaîne JSON ou None si le type n'a pas de champs extra.
     """
     mapping = {
         "about": {"email": extra_email, "location": extra_location},
@@ -85,7 +82,7 @@ def _build_extra(section_type: str, extra_email: str, extra_location: str,
     return json.dumps(data) if data is not None else None
 
 
-# ── Page principale ───────────────────────────────────────────────────────────
+# ── Page principale
 
 @router.get("/")
 async def portfolio(request: Request, db: Session = Depends(get_db)):
@@ -109,7 +106,7 @@ async def portfolio(request: Request, db: Session = Depends(get_db)):
     })
 
 
-# ── Admin — liste ─────────────────────────────────────────────────────────────
+# ── Admin — liste
 
 @router.get("/admin")
 async def admin(request: Request, db: Session = Depends(get_db), message: str = ""):
@@ -127,7 +124,7 @@ async def admin(request: Request, db: Session = Depends(get_db), message: str = 
     })
 
 
-# ── Admin — créer ─────────────────────────────────────────────────────────────
+# ── Admin — créer
 
 @router.post("/admin/sections")
 async def create_section(
@@ -164,8 +161,7 @@ async def create_section(
     return RedirectResponse(url="/admin?" + urlencode({"message": "Section ajoutée"}), status_code=303)
 
 
-# ── Admin — formulaire d'édition ──────────────────────────────────────────────
-
+# ── Admin — formulaire d'édition 
 @router.get("/admin/sections/{section_id}/edit")
 async def edit_section_form(section_id: int, request: Request, db: Session = Depends(get_db)):
     """Affiche le formulaire de modification d'une section existante.
@@ -178,7 +174,7 @@ async def edit_section_form(section_id: int, request: Request, db: Session = Dep
     return templates.TemplateResponse(request, "admin_edit.html", {"section": _parse_extra(section)})
 
 
-# ── Admin — enregistrer l'édition ────────────────────────────────────────────
+# ── Admin — enregistrer l'édition 
 
 @router.post("/admin/sections/{section_id}/edit")
 async def update_section(
@@ -218,7 +214,7 @@ async def update_section(
     return RedirectResponse(url="/admin?" + urlencode({"message": "Section modifiée"}), status_code=303)
 
 
-# ── Admin — supprimer ─────────────────────────────────────────────────────────
+# ── Admin — supprimer
 
 @router.post("/admin/sections/{section_id}/delete")
 async def delete_section(section_id: int, db: Session = Depends(get_db)):

@@ -20,7 +20,7 @@ class CvSectionUpdate(BaseModel):
     """Données pour modifier une section existante.
 
     Tous les champs sont optionnels : seuls les champs fournis sont mis à jour
-    (grâce à model_dump(exclude_unset=True) dans le CRUD).
+    
     """
 
     title: Optional[str] = None

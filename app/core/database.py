@@ -32,4 +32,4 @@ def get_db():
     try:
         yield db
     finally:
-        db.close() # Ensures the database session is always closed, even if exceptions occur.
+        db.close() 

@@ -24,9 +24,9 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Création de la base de données si elle n'existe pas encore
 create_db()
 
-#ajout de la route cv (expliqué en détail dans le fichier cv_router)
+#ajout de la route cv 
 app.include_router(cv_router.router)
 
 if __name__ == "__main__":
         uvicorn.run(app, host="localhost", port=8000)
-        #permet de lancer l'application sur un port de mon ordi pour héberger le site localement
+        #permet de lancer l'application sur un port d'un ordi pour héberger le site localement

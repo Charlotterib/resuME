@@ -14,7 +14,7 @@ class CvSection(Base):
         - experience : {"date_start": str, "date_end": str, "location": str}
         - formation  : {"date_start": str, "date_end": str}
         - skill      : {"level": int (0-100)}
-        - project    : {"url": str, "github": str}
+        - project    : {"url": str}
         - link       : {"url": str}
     """
 
